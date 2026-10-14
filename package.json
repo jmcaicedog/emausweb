@@ -1,26 +1,55 @@
 {
-  "name": "ecr-scaffold",
+  "name": "emauscristoreyweb",
   "version": "0.1.0",
   "private": true,
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "typecheck": "tsc --noEmit",
+    "db:local": "pglite-server --db=./.pglite --port=5433 --max-connections=20",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "tsx scripts/migrate.ts",
+    "db:seed": "tsx scripts/seed.ts",
+    "db:studio": "drizzle-kit studio"
   },
   "dependencies": {
+    "@electric-sql/pglite": "^0.5.9",
+    "@neondatabase/serverless": "^1.2.0",
+    "@vercel/blob": "^2.8.1",
+    "@vercel/functions": "^3.10.1",
+    "bcryptjs": "^3.0.3",
+    "clsx": "^2.1.1",
+    "drizzle-orm": "^0.45.4",
+    "embla-carousel-autoplay": "^8.6.0",
+    "embla-carousel-react": "^8.6.0",
+    "exceljs": "^4.4.0",
+    "jose": "^6.2.12",
+    "lucide-react": "^1.56.0",
     "next": "16.4.0",
+    "pg": "^8.23.1",
+    "qrcode": "^1.5.4",
     "react": "19.3.0",
-    "react-dom": "19.3.0"
+    "react-dom": "19.3.0",
+    "server-only": "^0.0.1",
+    "sharp": "^0.35.5",
+    "zod": "^4.6.7"
   },
   "devDependencies": {
+    "@electric-sql/pglite-socket": "^0.2.12",
     "@tailwindcss/turbopack": "^4",
     "@types/node": "^20",
+    "@types/pg": "^8.23.1",
+    "@types/qrcode": "^1.5.6",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "dotenv": "^18.0.7",
+    "drizzle-kit": "^0.31.11",
     "eslint": "^9",
     "eslint-config-next": "16.4.0",
     "tailwindcss": "^4",
+    "tsx": "^4.23.15",
     "typescript": "^5"
   }
 }
