@@ -33,7 +33,7 @@ export function PrayersSection({ morning, evening }: Props) {
                 </span>
                 <h3 className="text-xl font-extrabold sm:text-2xl">{title}</h3>
               </div>
-              <div className="mt-5 space-y-4 font-serif text-[1.05rem] leading-relaxed text-stone-700 whitespace-pre-line">
+              <div className="mt-5 space-y-4 text-[1.05rem] leading-relaxed text-stone-700 whitespace-pre-line">
                 {paragraphs(text).map((p, i) => (
                   <p key={i}>{p}</p>
                 ))}
