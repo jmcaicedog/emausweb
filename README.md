@@ -80,6 +80,10 @@ Esto es solo para desarrollo.
    DATABASE_URL="<url de neon>" SEED_ADMIN_EMAIL=... SEED_ADMIN_PASSWORD=... npm run db:migrate
    DATABASE_URL="<url de neon>" SEED_ADMIN_EMAIL=... SEED_ADMIN_PASSWORD=... npm run db:seed
    ```
+   Para crear o restablecer un administrador en producción, usar el asistente interactivo. Pide la `DATABASE_URL` y la contraseña sin mostrarlas en pantalla:
+   ```bash
+   npm run admin:create
+   ```
 5. Desplegar. Ingresar a `/admin` con el administrador creado y cambiar la contraseña desde **Usuarios**.
 
 > Si se cambia el dominio, actualizar `NEXT_PUBLIC_SITE_URL` y volver a descargar los QR, porque contienen la URL completa.
@@ -93,6 +97,7 @@ Esto es solo para desarrollo.
 | `npm run db:local` | PostgreSQL local con PGlite (puerto 5433, datos en `.pglite/`). |
 | `npm run db:generate` | Genera migraciones tras cambiar `src/db/schema.ts`. |
 | `npm run db:migrate` / `db:seed` | Aplica las migraciones y carga los datos iniciales. |
+| `npm run admin:create` | Crea un administrador o restablece su contraseña (interactivo). |
 | `npm run db:studio` | Explorador de la base de datos (Drizzle Studio). |
 
 ## Estructura

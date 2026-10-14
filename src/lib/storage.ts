@@ -30,12 +30,20 @@ export async function uploadImage(file: File, folder: string, maxWidth = 2000) {
   const name = `${folder}/${Date.now()}-${randomBytes(6).toString("hex")}.webp`;
 
   if (process.env.BLOB_READ_WRITE_TOKEN) {
-    const blob = await put(name, output, {
-      access: "public",
-      contentType: "image/webp",
-      cacheControlMaxAge: 60 * 60 * 24 * 365,
-    });
-    return blob.url;
+    try {
+      const blob = await put(name, output, {
+        access: "public",
+        contentType: "image/webp",
+        cacheControlMaxAge: 60 * 60 * 24 * 365,
+      });
+      return blob.url;
+    } catch (e) {
+      console.error("Error subiendo a Vercel Blob", e);
+      if (e instanceof Error && /private/i.test(e.message)) {
+        throw new UploadError("El almacenamiento de imágenes es privado. Debe configurarse un Blob Store público en Vercel.");
+      }
+      throw new UploadError("No se pudo subir la imagen. Inténtalo de nuevo.");
+    }
   }
 
   const target = path.join(LOCAL_UPLOAD_DIR, name);
