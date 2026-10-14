@@ -13,7 +13,7 @@ export default async function SettingsPage() {
   const s = (await adminSettings()) ?? DEFAULT_SETTINGS;
   return (
     <>
-      <PageHeader title="Configuración del sitio" description="WhatsApp, datos de contacto, Instagram y SEO." />
+      <PageHeader title="Configuración del sitio"       description="WhatsApp, datos de contacto, Instagram, oraciones y SEO." />
       <ActionForm action={saveSettings} className="space-y-6">
         <Card title="WhatsApp">
           <div className="grid gap-4 sm:grid-cols-2">
@@ -47,6 +47,32 @@ export default async function SettingsPage() {
             </FormField>
             <FormField name="spiritualCoordinator" label="Coordinador espiritual">
               <input id="spiritualCoordinator" name="spiritualCoordinator" defaultValue={s.spiritualCoordinator} className={inputCls} />
+            </FormField>
+          </div>
+        </Card>
+        <Card title="Evangelio del día">
+          <div className="grid gap-4">
+            <label className="flex items-center gap-2 text-sm font-medium">
+              <input type="checkbox" name="gospelEnabled" defaultChecked={s.gospelEnabled} className="size-4 accent-brand-700" /> Mostrar el video del
+              evangelio del día en la página principal
+            </label>
+            <div className="grid gap-4 sm:grid-cols-2">
+              <FormField name="gospelChannelId" label="ID del canal de YouTube" hint="Empieza por «UC». Por defecto: canal del Padre Ronal Pulido.">
+                <input id="gospelChannelId" name="gospelChannelId" maxLength={40} defaultValue={s.gospelChannelId} className={inputCls} />
+              </FormField>
+              <FormField name="gospelKeyword" label="Texto que identifica el video" hint="Se busca en el título del video (sin importar mayúsculas ni tildes).">
+                <input id="gospelKeyword" name="gospelKeyword" maxLength={80} defaultValue={s.gospelKeyword} className={inputCls} />
+              </FormField>
+            </div>
+          </div>
+        </Card>
+        <Card title="Oraciones">
+          <div className="grid gap-4 lg:grid-cols-2">
+            <FormField name="morningPrayer" label="Oración de la mañana" hint="Separa los párrafos con una línea en blanco. Vacío oculta la oración.">
+              <textarea id="morningPrayer" name="morningPrayer" rows={10} maxLength={4000} defaultValue={s.morningPrayer} className={inputCls} />
+            </FormField>
+            <FormField name="eveningPrayer" label="Oración de la noche" hint="Si ambas quedan vacías, la sección no se muestra.">
+              <textarea id="eveningPrayer" name="eveningPrayer" rows={10} maxLength={4000} defaultValue={s.eveningPrayer} className={inputCls} />
             </FormField>
           </div>
         </Card>

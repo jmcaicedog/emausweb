@@ -18,6 +18,7 @@ const nextConfig: NextConfig = {
     localPatterns: [{ pathname: "/**" }],
     remotePatterns: [
       { protocol: "https", hostname: "*.public.blob.vercel-storage.com" },
+      { protocol: "https", hostname: "i.ytimg.com", pathname: "/vi/**" },
     ],
     minimumCacheTTL: 2678400,
   },

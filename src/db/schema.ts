@@ -41,6 +41,11 @@ export const siteSettings = pgTable("site_settings", {
   mapUrl: text("map_url").notNull().default(""),
   seoTitle: varchar("seo_title", { length: 120 }).notNull().default(""),
   seoDescription: varchar("seo_description", { length: 300 }).notNull().default(""),
+  morningPrayer: text("morning_prayer").notNull().default(""),
+  eveningPrayer: text("evening_prayer").notNull().default(""),
+  gospelEnabled: boolean("gospel_enabled").notNull().default(true),
+  gospelChannelId: varchar("gospel_channel_id", { length: 40 }).notNull().default("UCP9NtaODIi1Fr4mCZa1ahow"),
+  gospelKeyword: varchar("gospel_keyword", { length: 80 }).notNull().default("EVANGELIO DE HOY"),
   ...timestamps,
 });
 

@@ -3,7 +3,9 @@ import { JsonLd } from "@/components/seo/json-ld";
 import { Banner } from "@/components/site/banner";
 import { ContactSection } from "@/components/site/contact-section";
 import { EventsCalendar } from "@/components/site/events-calendar";
+import { GospelSection } from "@/components/site/gospel-section";
 import { InstagramSection } from "@/components/site/instagram-section";
+import { PrayersSection } from "@/components/site/prayers-section";
 import { ToolsSection } from "@/components/site/tools-section";
 import { getActiveSlides, getActiveTools, getCalendarEvents, getGallery, getSettings } from "@/lib/data/public";
 import { siteUrl } from "@/lib/utils";
@@ -67,6 +69,8 @@ export default async function HomePage() {
         </div>
       </section>
 
+      {settings.gospelEnabled && <GospelSection channelId={settings.gospelChannelId} keyword={settings.gospelKeyword} />}
+      <PrayersSection morning={settings.morningPrayer} evening={settings.eveningPrayer} />
       <ToolsSection tools={tools} />
       <InstagramSection items={gallery} profileUrl={settings.instagramUrl} />
       <ContactSection settings={settings} />

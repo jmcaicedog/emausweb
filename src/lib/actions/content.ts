@@ -28,6 +28,11 @@ const settingsSchema = z.object({
   mapUrl: zUrl,
   seoTitle: z.string().min(3, "Requerido").max(120),
   seoDescription: z.string().min(20, "Mínimo 20 caracteres").max(300),
+  morningPrayer: z.string().max(4000),
+  eveningPrayer: z.string().max(4000),
+  gospelEnabled: z.boolean(),
+  gospelChannelId: z.union([z.literal(""), z.string().regex(/^UC[\w-]{22}$/, "ID de canal no válido (empieza por UC y tiene 24 caracteres)")]),
+  gospelKeyword: z.string().max(80),
 });
 
 export async function saveSettings(_: ActionState, fd: FormData): Promise<ActionState> {
@@ -44,6 +49,11 @@ export async function saveSettings(_: ActionState, fd: FormData): Promise<Action
     mapUrl: str(fd, "mapUrl"),
     seoTitle: str(fd, "seoTitle"),
     seoDescription: str(fd, "seoDescription"),
+    morningPrayer: str(fd, "morningPrayer"),
+    eveningPrayer: str(fd, "eveningPrayer"),
+    gospelEnabled: bool(fd, "gospelEnabled"),
+    gospelChannelId: str(fd, "gospelChannelId"),
+    gospelKeyword: str(fd, "gospelKeyword"),
   });
   if (!parsed.success) return fromZod(parsed.error);
   await db

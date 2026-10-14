@@ -5,6 +5,8 @@ import { MobileMenu } from "./mobile-menu";
 
 export const NAV_ITEMS = [
   { href: "/#eventos", label: "Eventos" },
+  { href: "/#evangelio", label: "Evangelio" },
+  { href: "/#oraciones", label: "Oraciones" },
   { href: "/#herramientas", label: "Herramientas" },
   { href: "/#instagram", label: "Instagram" },
   { href: "/#contacto", label: "Contacto" },

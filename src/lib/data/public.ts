@@ -19,6 +19,11 @@ export const DEFAULT_SETTINGS = {
   mapUrl: "",
   seoTitle: "Emaús Cristo Rey Cali",
   seoDescription: "Comunidad Emaús Hombres de la Parroquia Cristo Rey en Cali.",
+  morningPrayer: "",
+  eveningPrayer: "",
+  gospelEnabled: true,
+  gospelChannelId: "UCP9NtaODIi1Fr4mCZa1ahow",
+  gospelKeyword: "EVANGELIO DE HOY",
 };
 
 export type PublicSettings = typeof DEFAULT_SETTINGS;
@@ -42,6 +47,11 @@ export async function getSettings(): Promise<PublicSettings> {
     mapUrl: row.mapUrl,
     seoTitle: row.seoTitle || DEFAULT_SETTINGS.seoTitle,
     seoDescription: row.seoDescription || DEFAULT_SETTINGS.seoDescription,
+    morningPrayer: row.morningPrayer,
+    eveningPrayer: row.eveningPrayer,
+    gospelEnabled: row.gospelEnabled,
+    gospelChannelId: row.gospelChannelId,
+    gospelKeyword: row.gospelKeyword,
   };
 }
 

@@ -32,7 +32,7 @@ export function InstagramSection({ items, profileUrl }: { items: Item[]; profile
                   href={item.postUrl || profileUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="group relative block aspect-square overflow-hidden rounded-2xl bg-stone-100"
+                  className="group relative block aspect-[2/3] overflow-hidden rounded-2xl bg-stone-100"
                 >
                   <Image
                     src={item.imageUrl}

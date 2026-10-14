@@ -17,7 +17,7 @@ export default async function GalleryPage() {
     <>
       <PageHeader
         title="Galería de Instagram"
-        description="Hasta 5 imágenes cuadradas (1080×1080 px) que se muestran en la sección de Instagram. La URL de la cuenta se edita en Configuración."
+        description="Hasta 5 imágenes verticales (1080×1620 px, proporción 2:3) que se muestran en la sección de Instagram. La URL de la cuenta se edita en Configuración."
       />
       <div className="grid gap-6 md:grid-cols-2">
         {items.map((item, i) => (
@@ -57,7 +57,7 @@ function ItemFields({ item }: { item?: Item }) {
   return (
     <div className="grid gap-4">
       <FormField name="image" label="Imagen">
-        <ImageInput name="image" defaultUrl={item?.imageUrl} maxWidth={1080} aspect="aspect-square" required={!item} />
+        <ImageInput name="image" defaultUrl={item?.imageUrl} maxWidth={1080} aspect="aspect-[2/3] max-w-60 mx-auto" required={!item} />
       </FormField>
       <FormField name="alt" htmlFor={p + "alt"} label="Descripción (texto alternativo)" hint="Describe la imagen para accesibilidad y SEO.">
         <input id={p + "alt"} name="alt" maxLength={300} defaultValue={item?.alt ?? ""} className={inputCls} />
