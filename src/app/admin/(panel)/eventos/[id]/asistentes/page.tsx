@@ -1,6 +1,7 @@
 import { ArrowLeft, FileSpreadsheet, FileText } from "lucide-react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { AttendeeDraw } from "@/components/admin/attendee-draw";
 import { PageHeader, buttonCls } from "@/components/admin/ui";
 import { adminEvent, eventAttendees } from "@/lib/data/admin";
 import { formatDateTime, formatShortDate } from "@/lib/dates";
@@ -37,6 +38,7 @@ export default async function AttendeesPage({ params }: PageProps<"/admin/evento
           )
         }
       />
+      {list.length > 0 && <AttendeeDraw attendees={list} />}
       {list.length === 0 ? (
         <p className="rounded-xl border border-dashed border-stone-300 bg-white p-10 text-center text-stone-500">Nadie se ha registrado todavía.</p>
       ) : (
