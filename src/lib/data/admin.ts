@@ -45,13 +45,13 @@ export async function adminUsersList() {
 }
 
 const attendeeCount = db
-  .select({ eventId: attendances.eventId, total: count().as("total") })
+  .select({ eventId: attendances.eventId, total: count().as("attendee_total") })
   .from(attendances)
   .groupBy(attendances.eventId)
   .as("ac");
 
 const specialRegistrationCount = db
-  .select({ eventId: eventRegistrations.eventId, total: count().as("total") })
+  .select({ eventId: eventRegistrations.eventId, total: count().as("registration_total") })
   .from(eventRegistrations)
   .groupBy(eventRegistrations.eventId)
   .as("src");
