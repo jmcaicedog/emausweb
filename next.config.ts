@@ -23,6 +23,7 @@ const nextConfig: NextConfig = {
     minimumCacheTTL: 2678400,
   },
   experimental: {
+    agentUpgrade: "security",
     serverActions: { bodySizeLimit: "4mb" },
   },
   async headers() {
