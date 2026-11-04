@@ -112,6 +112,14 @@ export async function adminPeople(q: string) {
   return rows.map((r) => ({ ...r, total: Number(r.total ?? 0) }));
 }
 
+export async function adminBirthdays() {
+  await requireAdmin();
+  return db
+    .select({ id: people.id, fullName: people.fullName, birthDate: people.birthDate })
+    .from(people)
+    .orderBy(asc(people.fullName));
+}
+
 export async function adminPerson(id: number) {
   await requireAdmin();
   if (!Number.isInteger(id)) return null;

@@ -1,6 +1,6 @@
 "use client";
 
-import { CalendarDays, Camera, Cog, ExternalLink, Images, LayoutDashboard, LogOut, Users, UserSquare2, Wrench } from "lucide-react";
+import { Cake, CalendarDays, Camera, Cog, ExternalLink, Images, LayoutDashboard, LogOut, Users, UserSquare2, Wrench } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { logout } from "@/lib/actions/auth";
@@ -10,6 +10,7 @@ const ITEMS = [
   { href: "/admin", label: "Inicio", icon: LayoutDashboard, exact: true },
   { href: "/admin/eventos", label: "Eventos y QR", icon: CalendarDays },
   { href: "/admin/personas", label: "Personas", icon: UserSquare2 },
+  { href: "/admin/cumpleanos", label: "Cumpleaños", icon: Cake },
   { href: "/admin/banner", label: "Banner", icon: Images },
   { href: "/admin/galeria", label: "Instagram", icon: Camera },
   { href: "/admin/herramientas", label: "Herramientas", icon: Wrench },
