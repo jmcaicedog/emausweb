@@ -14,7 +14,7 @@ async function openEvent(token: string) {
   const [ev] = await db
     .select({ id: events.id })
     .from(events)
-    .where(and(eq(events.attendanceToken, token), eq(events.published, true)))
+    .where(and(eq(events.attendanceToken, token), eq(events.published, true), eq(events.isSpecial, false)))
     .limit(1);
   return ev ?? null;
 }

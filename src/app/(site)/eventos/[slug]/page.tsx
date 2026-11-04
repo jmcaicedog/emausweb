@@ -98,6 +98,20 @@ export default async function EventPage({ params }: PageProps<"/eventos/[slug]">
           </div>
         )}
         {event.description && <div className="mt-8 text-lg leading-relaxed whitespace-pre-line text-stone-700">{event.description}</div>}
+        {event.isSpecial && event.registrationToken && (
+          <div className="mt-8 rounded-2xl border border-brand-100 bg-brand-50 p-5 sm:p-6">
+            <p className="font-bold text-brand-900">Inscripción requerida</p>
+            <p className="mt-1 text-sm text-stone-700">
+              Valor por persona:{" "}
+              <span className="font-extrabold">
+                {new Intl.NumberFormat("es-CO", { style: "currency", currency: "COP", maximumFractionDigits: 0 }).format(event.pricePerPerson)}
+              </span>
+            </p>
+            <Link href={`/inscripcion/${event.registrationToken}`} className="mt-4 inline-flex rounded-full bg-brand-700 px-5 py-2.5 text-sm font-bold text-white hover:bg-brand-800">
+              Inscribirme
+            </Link>
+          </div>
+        )}
       </div>
     </article>
   );

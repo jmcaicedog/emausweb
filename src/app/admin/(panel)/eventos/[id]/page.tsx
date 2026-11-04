@@ -19,18 +19,20 @@ export default async function EditEventPage({ params, searchParams }: PageProps<
   const [{ id }, sp] = await Promise.all([params, searchParams]);
   const event = await adminEvent(Number(id));
   if (!event) notFound();
-  const attendanceUrl = `${siteUrl()}/asistencia/${event.attendanceToken}`;
-  const svg = await QRCode.toString(attendanceUrl, { type: "svg", margin: 1, errorCorrectionLevel: "M", color: { dark: "#1c1917", light: "#ffffff" } });
+  const qrUrl = event.isSpecial && event.registrationToken
+    ? `${siteUrl()}/inscripcion/${event.registrationToken}`
+    : `${siteUrl()}/asistencia/${event.attendanceToken}`;
+  const svg = await QRCode.toString(qrUrl, { type: "svg", margin: 1, errorCorrectionLevel: "M", color: { dark: "#1c1917", light: "#ffffff" } });
 
   return (
     <>
       <PageHeader
         title={event.title}
-        description={event.published ? undefined : "Borrador: no aparece en el sitio y el llamado a lista está deshabilitado."}
+        description={event.published ? undefined : "Borrador: no aparece en el sitio y la inscripción está deshabilitada."}
         actions={
           <>
-            <Link href={`/admin/eventos/${event.id}/asistentes`} className={buttonCls.secondary}>
-              <Users className="size-4" /> Asistentes
+            <Link href={`/admin/eventos/${event.id}/${event.isSpecial ? "inscripciones" : "asistentes"}`} className={buttonCls.secondary}>
+              <Users className="size-4" /> {event.isSpecial ? "Inscritos" : "Asistentes"}
             </Link>
             {event.published && (
               <a href={`/eventos/${event.slug}`} target="_blank" className={buttonCls.secondary}>
@@ -46,15 +48,31 @@ export default async function EditEventPage({ params, searchParams }: PageProps<
         </p>
       )}
 
-      <Card title="Código QR para el llamado a lista" className="mb-6 scroll-mt-6" actions={event.published ? <Badge tone="green">Activo</Badge> : <Badge tone="amber">Inactivo</Badge>}>
+      <Card
+        title={event.isSpecial ? "Código QR para inscripción" : "Código QR para el llamado a lista"}
+        className="mb-6 scroll-mt-6"
+        actions={event.published ? <Badge tone="green">Activo</Badge> : <Badge tone="amber">Inactivo</Badge>}
+      >
         <div id="qr" className="scroll-mt-6">
-          <QrPanel svg={svg} url={attendanceUrl} pngHref={`/admin/qr/${event.id}`} fileName={`qr-${event.slug}.png`} title={event.title} />
-          <form action={regenerateAttendanceToken} className="mt-4 border-t border-stone-100 pt-4">
-            <input type="hidden" name="id" value={event.id} />
-            <ConfirmSubmit variant="ghost" message="El código QR actual dejará de funcionar. ¿Generar uno nuevo?">
-              Generar un nuevo código (invalida el actual)
-            </ConfirmSubmit>
-          </form>
+          <QrPanel
+            svg={svg}
+            url={qrUrl}
+            pngHref={event.isSpecial ? `/admin/qr/inscripcion/${event.id}` : `/admin/qr/${event.id}`}
+            fileName={`${event.isSpecial ? "inscripcion" : "qr"}-${event.slug}.png`}
+            title={event.title}
+            purpose={event.isSpecial ? "Inscripción al evento" : "Llamado a lista"}
+            description={event.isSpecial
+              ? "Comparte este código para que los asistentes consulten sus datos y se inscriban al evento."
+              : undefined}
+          />
+          {!event.isSpecial && (
+            <form action={regenerateAttendanceToken} className="mt-4 border-t border-stone-100 pt-4">
+              <input type="hidden" name="id" value={event.id} />
+              <ConfirmSubmit variant="ghost" message="El código QR actual dejará de funcionar. ¿Generar uno nuevo?">
+                Generar un nuevo código (invalida el actual)
+              </ConfirmSubmit>
+            </form>
+          )}
         </div>
       </Card>
 
@@ -70,7 +88,7 @@ export default async function EditEventPage({ params, searchParams }: PageProps<
 
       <form action={deleteEvent} className="mt-6 flex justify-end">
         <input type="hidden" name="id" value={event.id} />
-        <ConfirmSubmit message="¿Eliminar este evento y todos sus registros de asistencia? Esta acción no se puede deshacer.">Eliminar evento</ConfirmSubmit>
+        <ConfirmSubmit message="¿Eliminar este evento y todos sus registros de asistencia, inscripciones y pagos? Esta acción no se puede deshacer.">Eliminar evento</ConfirmSubmit>
       </form>
     </>
   );

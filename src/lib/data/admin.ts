@@ -1,7 +1,18 @@
 import "server-only";
-import { and, asc, count, desc, eq, gte, ilike, or } from "drizzle-orm";
+import { and, asc, count, desc, eq, gte, ilike, inArray, or, sql } from "drizzle-orm";
 import { db } from "@/db";
-import { adminUsers, attendances, bannerSlides, events, galleryItems, people, siteSettings, tools } from "@/db/schema";
+import {
+  adminUsers,
+  attendances,
+  bannerSlides,
+  eventRegistrationPayments,
+  eventRegistrations,
+  events,
+  galleryItems,
+  people,
+  siteSettings,
+  tools,
+} from "@/db/schema";
 import { requireAdmin } from "@/lib/auth/dal";
 
 export async function adminSettings() {
@@ -39,6 +50,12 @@ const attendeeCount = db
   .groupBy(attendances.eventId)
   .as("ac");
 
+const specialRegistrationCount = db
+  .select({ eventId: eventRegistrations.eventId, total: count().as("total") })
+  .from(eventRegistrations)
+  .groupBy(eventRegistrations.eventId)
+  .as("src");
+
 export async function adminEvents(scope: "upcoming" | "past" | "all" = "all") {
   await requireAdmin();
   const now = new Date();
@@ -53,13 +70,20 @@ export async function adminEvents(scope: "upcoming" | "past" | "all" = "all") {
       published: events.published,
       imageUrl: events.imageUrl,
       attendees: attendeeCount.total,
+      isSpecial: events.isSpecial,
+      registrations: specialRegistrationCount.total,
     })
     .from(events)
     .leftJoin(attendeeCount, eq(attendeeCount.eventId, events.id))
+    .leftJoin(specialRegistrationCount, eq(specialRegistrationCount.eventId, events.id))
     .where(where)
     .orderBy(scope === "upcoming" ? asc(events.startsAt) : desc(events.startsAt))
     .limit(scope === "upcoming" ? 5 : 500);
-  return rows.map((r) => ({ ...r, attendees: Number(r.attendees ?? 0) }));
+  return rows.map((r) => ({
+    ...r,
+    attendees: Number(r.attendees ?? 0),
+    registrations: Number(r.registrations ?? 0),
+  }));
 }
 
 export async function adminEvent(id: number) {
@@ -85,6 +109,76 @@ export async function eventAttendees(eventId: number) {
     .innerJoin(people, eq(people.id, attendances.personId))
     .where(eq(attendances.eventId, eventId))
     .orderBy(asc(attendances.createdAt));
+}
+
+export async function eventSpecialRegistrations(eventId: number) {
+  await requireAdmin();
+  const registrations = await db
+    .select({
+      id: eventRegistrations.id,
+      personId: people.id,
+      documentNumber: people.documentNumber,
+      fullName: people.fullName,
+      phone: people.phone,
+      birthDate: people.birthDate,
+      companions: eventRegistrations.companions,
+      amountDue: eventRegistrations.amountDue,
+      attendanceToken: eventRegistrations.attendanceToken,
+      checkedInAt: eventRegistrations.checkedInAt,
+      createdAt: eventRegistrations.createdAt,
+      amountPaid: sql<number>`coalesce(sum(${eventRegistrationPayments.amount}), 0)`.mapWith(Number),
+    })
+    .from(eventRegistrations)
+    .innerJoin(people, eq(people.id, eventRegistrations.personId))
+    .leftJoin(eventRegistrationPayments, eq(eventRegistrationPayments.registrationId, eventRegistrations.id))
+    .where(eq(eventRegistrations.eventId, eventId))
+    .groupBy(eventRegistrations.id, people.id)
+    .orderBy(asc(people.fullName));
+
+  if (registrations.length === 0) return [];
+  const payments = await db
+    .select({
+      id: eventRegistrationPayments.id,
+      registrationId: eventRegistrationPayments.registrationId,
+      amount: eventRegistrationPayments.amount,
+      createdAt: eventRegistrationPayments.createdAt,
+      adminName: adminUsers.name,
+    })
+    .from(eventRegistrationPayments)
+    .innerJoin(adminUsers, eq(adminUsers.id, eventRegistrationPayments.adminUserId))
+    .where(inArray(eventRegistrationPayments.registrationId, registrations.map((registration) => registration.id)))
+    .orderBy(desc(eventRegistrationPayments.createdAt));
+  const paymentsByRegistration = new Map<number, typeof payments>();
+  for (const payment of payments) {
+    const list = paymentsByRegistration.get(payment.registrationId) ?? [];
+    list.push(payment);
+    paymentsByRegistration.set(payment.registrationId, list);
+  }
+  return registrations.map((registration) => ({
+    ...registration,
+    amountPaid: Number(registration.amountPaid),
+    payments: paymentsByRegistration.get(registration.id) ?? [],
+  }));
+}
+
+export async function specialRegistrationByToken(token: string) {
+  await requireAdmin();
+  if (!token || token.length > 64) return null;
+  const [registration] = await db
+    .select({
+      id: eventRegistrations.id,
+      eventId: events.id,
+      eventTitle: events.title,
+      personName: people.fullName,
+      companions: eventRegistrations.companions,
+      checkedInAt: eventRegistrations.checkedInAt,
+    })
+    .from(eventRegistrations)
+    .innerJoin(events, eq(events.id, eventRegistrations.eventId))
+    .innerJoin(people, eq(people.id, eventRegistrations.personId))
+    .where(eq(eventRegistrations.attendanceToken, token))
+    .limit(1);
+  return registration ?? null;
 }
 
 export async function adminPeople(q: string) {

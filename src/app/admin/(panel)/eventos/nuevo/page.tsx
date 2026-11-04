@@ -11,7 +11,7 @@ export const metadata = { title: "Nuevo evento" };
 export default function NewEventPage() {
   return (
     <>
-      <PageHeader title="Nuevo evento" description="Al guardarlo se genera automáticamente su código QR de asistencia." />
+      <PageHeader title="Nuevo evento" description="Al guardarlo se genera el código QR de inscripción o de asistencia según el tipo de evento." />
       <Card>
         <ActionForm action={createEvent}>
           <EventFields />

@@ -1,12 +1,12 @@
 "use server";
 
 import { randomBytes } from "node:crypto";
-import { and, eq, ne } from "drizzle-orm";
+import { and, count, eq, ne } from "drizzle-orm";
 import { refresh, updateTag } from "next/cache";
 import { redirect } from "next/navigation";
 import { z } from "zod";
 import { db } from "@/db";
-import { events } from "@/db/schema";
+import { eventRegistrations, events } from "@/db/schema";
 import { requireAdmin } from "@/lib/auth/dal";
 import { parseLocalDateTime } from "@/lib/dates";
 import { deleteImage, hasFile, uploadImage } from "@/lib/storage";
@@ -29,6 +29,8 @@ const eventSchema = z
     location: z.string().max(300),
     mapUrl: zUrl,
     published: z.boolean(),
+    isSpecial: z.boolean(),
+    pricePerPerson: z.number().int().min(0, "El precio no puede ser negativo").max(20_000_000, "El precio es demasiado alto"),
   })
   .refine((v) => !v.endsAt || v.endsAt >= v.startsAt, { message: "La hora de fin debe ser posterior al inicio", path: ["endsAt"] });
 
@@ -42,6 +44,8 @@ function eventInput(fd: FormData) {
     location: str(fd, "location"),
     mapUrl: str(fd, "mapUrl"),
     published: bool(fd, "published"),
+    isSpecial: bool(fd, "isSpecial"),
+    pricePerPerson: Number(str(fd, "pricePerPerson") || 0),
   });
 }
 
@@ -67,7 +71,13 @@ export async function createEvent(_: ActionState, fd: FormData): Promise<ActionS
     const slug = await uniqueSlug(parsed.data.slug);
     const [row] = await db
       .insert(events)
-      .values({ ...parsed.data, slug, imageUrl, attendanceToken: newAttendanceToken() })
+      .values({
+        ...parsed.data,
+        slug,
+        imageUrl,
+        attendanceToken: newAttendanceToken(),
+        registrationToken: parsed.data.isSpecial ? newAttendanceToken() : null,
+      })
       .returning({ id: events.id });
     id = row.id;
   } catch (e) {
@@ -84,6 +94,13 @@ export async function updateEvent(_: ActionState, fd: FormData): Promise<ActionS
   if (!parsed.success) return fromZod(parsed.error);
   const [current] = await db.select().from(events).where(eq(events.id, id)).limit(1);
   if (!current) return { error: "Evento no encontrado." };
+  if (current.isSpecial && !parsed.data.isSpecial) {
+    const [registrations] = await db
+      .select({ total: count() })
+      .from(eventRegistrations)
+      .where(eq(eventRegistrations.eventId, id));
+    if (registrations.total > 0) return { error: "No puedes quitar la inscripción especial mientras existan registros asociados." };
+  }
   try {
     const image = fd.get("image");
     let imageUrl: string | null | undefined;
@@ -92,7 +109,13 @@ export async function updateEvent(_: ActionState, fd: FormData): Promise<ActionS
     const slug = await uniqueSlug(parsed.data.slug, id);
     await db
       .update(events)
-      .set({ ...parsed.data, slug, ...(imageUrl !== undefined ? { imageUrl } : {}), updatedAt: new Date() })
+      .set({
+        ...parsed.data,
+        slug,
+        ...(parsed.data.isSpecial && !current.registrationToken ? { registrationToken: newAttendanceToken() } : {}),
+        ...(imageUrl !== undefined ? { imageUrl } : {}),
+        updatedAt: new Date(),
+      })
       .where(eq(events.id, id));
     if (imageUrl !== undefined) await deleteImage(current.imageUrl);
     updateTag(TAGS.events);

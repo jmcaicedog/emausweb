@@ -4,7 +4,23 @@ import { Check, Copy, Download, ExternalLink, Share2 } from "lucide-react";
 import { useState } from "react";
 import { buttonCls } from "./ui";
 
-export function QrPanel({ svg, url, pngHref, fileName, title }: { svg: string; url: string; pngHref: string; fileName: string; title: string }) {
+export function QrPanel({
+  svg,
+  url,
+  pngHref,
+  fileName,
+  title,
+  purpose = "Llamado a lista",
+  description = "Los asistentes escanean este código y diligencian su cédula, nombre, teléfono y fecha de nacimiento. Cada persona puede registrarse una sola vez por evento.",
+}: {
+  svg: string;
+  url: string;
+  pngHref: string;
+  fileName: string;
+  title: string;
+  purpose?: string;
+  description?: string;
+}) {
   const [copied, setCopied] = useState(false);
   const [shareError, setShareError] = useState<string | null>(null);
 
@@ -16,7 +32,7 @@ export function QrPanel({ svg, url, pngHref, fileName, title }: { svg: string; u
 
   async function share() {
     setShareError(null);
-    const text = `Llamado a lista: ${title}`;
+    const text = `${purpose}: ${title}`;
     try {
       const res = await fetch(pngHref);
       const file = new File([await res.blob()], fileName, { type: "image/png" });
@@ -40,13 +56,11 @@ export function QrPanel({ svg, url, pngHref, fileName, title }: { svg: string; u
       <div
         className="mx-auto w-56 shrink-0 rounded-xl border border-stone-200 bg-white p-3 sm:mx-0 [&_svg]:h-auto [&_svg]:w-full"
         role="img"
-        aria-label={`Código QR de asistencia para ${title}`}
+        aria-label={`Código QR de ${purpose.toLowerCase()} para ${title}`}
         dangerouslySetInnerHTML={{ __html: svg }}
       />
       <div className="min-w-0 flex-1 space-y-4">
-        <p className="text-sm text-stone-600">
-          Los asistentes escanean este código y diligencian su cédula, nombre, teléfono y fecha de nacimiento. Cada persona puede registrarse una sola vez por evento.
-        </p>
+        <p className="text-sm text-stone-600">{description}</p>
         <div className="flex items-center gap-2 rounded-lg border border-stone-200 bg-stone-50 p-2">
           <code className="min-w-0 flex-1 truncate px-1 text-xs">{url}</code>
           <button type="button" onClick={copy} className={buttonCls.ghost} aria-label="Copiar enlace">

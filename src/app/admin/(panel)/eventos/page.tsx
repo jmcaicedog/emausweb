@@ -15,7 +15,7 @@ export default async function EventsPage() {
     <>
       <PageHeader
         title="Eventos"
-        description="Cada evento tiene su propio código QR para el llamado a lista."
+        description="Administra eventos regulares y actividades especiales con inscripción."
         actions={
           <Link href="/admin/eventos/nuevo" className={buttonCls.primary}>
             <Plus className="size-4" /> Nuevo evento
@@ -32,7 +32,7 @@ export default async function EventsPage() {
                 <th className="px-4 py-3">Evento</th>
                 <th className="px-4 py-3">Fecha</th>
                 <th className="px-4 py-3">Estado</th>
-                <th className="px-4 py-3 text-right">Asistentes</th>
+                <th className="px-4 py-3 text-right">Asistentes / inscritos</th>
                 <th className="px-4 py-3"><span className="sr-only">Acciones</span></th>
               </tr>
             </thead>
@@ -46,15 +46,20 @@ export default async function EventsPage() {
                     {e.location && <p className="text-xs text-stone-500">{e.location}</p>}
                   </td>
                   <td className="px-4 py-3 whitespace-nowrap">{formatDateTime(e.startsAt)}</td>
-                  <td className="px-4 py-3">{e.published ? <Badge tone="green">Publicado</Badge> : <Badge>Borrador</Badge>}</td>
-                  <td className="px-4 py-3 text-right font-semibold tabular-nums">{e.attendees}</td>
+                  <td className="px-4 py-3">
+                    <div className="flex flex-wrap gap-1">
+                      {e.isSpecial && <Badge tone="amber">Especial</Badge>}
+                      {e.published ? <Badge tone="green">Publicado</Badge> : <Badge>Borrador</Badge>}
+                    </div>
+                  </td>
+                  <td className="px-4 py-3 text-right font-semibold tabular-nums">{e.isSpecial ? e.registrations : e.attendees}</td>
                   <td className="px-4 py-3">
                     <div className="flex justify-end gap-1">
                       <Link href={`/admin/eventos/${e.id}#qr`} className={buttonCls.ghost} title="Código QR">
                         <QrCode className="size-4" /><span className="sr-only">Código QR</span>
                       </Link>
-                      <Link href={`/admin/eventos/${e.id}/asistentes`} className={buttonCls.ghost} title="Asistentes">
-                        <Users className="size-4" /><span className="sr-only">Asistentes</span>
+                      <Link href={`/admin/eventos/${e.id}/${e.isSpecial ? "inscripciones" : "asistentes"}`} className={buttonCls.ghost} title={e.isSpecial ? "Inscritos" : "Asistentes"}>
+                        <Users className="size-4" /><span className="sr-only">{e.isSpecial ? "Inscritos" : "Asistentes"}</span>
                       </Link>
                     </div>
                   </td>

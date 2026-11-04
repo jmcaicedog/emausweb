@@ -13,6 +13,8 @@ type EventLike = {
   location: string;
   mapUrl: string;
   published: boolean;
+  isSpecial: boolean;
+  pricePerPerson: number;
 };
 
 export function EventFields({ event }: { event?: EventLike }) {
@@ -42,6 +44,26 @@ export function EventFields({ event }: { event?: EventLike }) {
         </FormField>
         <FormField name="description" label="Descripción" className="sm:col-span-2">
           <textarea id="description" name="description" rows={7} maxLength={5000} defaultValue={event?.description} className={inputCls} />
+        </FormField>
+        <label className="flex items-start gap-2 text-sm font-semibold sm:col-span-2">
+          <input type="checkbox" name="isSpecial" defaultChecked={event?.isSpecial ?? false} className="mt-0.5 size-4 accent-brand-700" />
+          <span>
+            Evento especial con inscripción y control de pagos
+            <span className="mt-0.5 block text-xs font-normal text-stone-500">Genera un formulario público y un QR de asistencia por inscripción.</span>
+          </span>
+        </label>
+        <FormField name="pricePerPerson" label="Precio por persona (COP)" hint="Solo aplica a eventos especiales; se multiplica por el titular más sus acompañantes." className="sm:col-span-2">
+          <input
+            id="pricePerPerson"
+            name="pricePerPerson"
+            type="number"
+            min="0"
+            max="20000000"
+            step="1"
+            required
+            defaultValue={event?.pricePerPerson ?? 0}
+            className={inputCls}
+          />
         </FormField>
         <label className="flex items-center gap-2 text-sm font-semibold sm:col-span-2">
           <input type="checkbox" name="published" defaultChecked={event?.published ?? true} className="size-4 accent-brand-700" />

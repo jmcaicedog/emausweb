@@ -107,6 +107,9 @@ const publicEventFields = {
   endsAt: events.endsAt,
   location: events.location,
   mapUrl: events.mapUrl,
+  isSpecial: events.isSpecial,
+  pricePerPerson: events.pricePerPerson,
+  registrationToken: events.registrationToken,
 };
 
 export type PublicEvent = {
@@ -119,6 +122,9 @@ export type PublicEvent = {
   endsAt: Date | null;
   location: string;
   mapUrl: string;
+  isSpecial: boolean;
+  pricePerPerson: number;
+  registrationToken: string | null;
 };
 
 /** Eventos publicados desde el mes en curso (hora Bogotá) y el mes actual de referencia. */

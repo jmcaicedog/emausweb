@@ -24,9 +24,16 @@ Next.js 16 (App Router + Cache Components), React 19, Tailwind CSS 4, Drizzle OR
 - Solo se permite un registro por persona y por evento (restricción única en la base de datos).
 - Desde el panel se puede regenerar el código, lo que invalida el QR anterior.
 
+**Eventos especiales**
+
+- Los eventos especiales publicados muestran su descripción, imagen, precio por persona y un formulario público de inscripción.
+- La inscripción precarga datos por documento, permite indicar acompañantes y calcula el total antes de confirmar.
+- Cada inscripción genera un QR de asistencia para el grupo. El panel registra asistencia y permite a los administradores ingresar abonos o pagos completos; el saldo se calcula automáticamente.
+- Las inscripciones y pagos se consultan desde cada evento en el panel.
+
 **Backoffice (`/admin`)**
 
-- Eventos: crear, editar, publicar, eliminar, código QR, lista de asistentes y exportación a Excel o CSV.
+- Eventos: crear, editar, publicar, eliminar, código QR, lista de asistentes o inscritos y exportación de asistentes a Excel o CSV.
 - Personas: búsqueda e historial de asistencia por persona.
 - Banner, galería de Instagram, herramientas, configuración general (WhatsApp, contacto y redes) y usuarios administradores.
 

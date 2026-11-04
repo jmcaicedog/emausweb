@@ -45,7 +45,7 @@ async function AttendanceContent({ params }: { params: PageProps<"/asistencia/[t
       ? await db
           .select({ title: events.title, startsAt: events.startsAt, location: events.location })
           .from(events)
-          .where(and(eq(events.attendanceToken, token), eq(events.published, true)))
+          .where(and(eq(events.attendanceToken, token), eq(events.published, true), eq(events.isSpecial, false)))
           .limit(1)
       : [];
 

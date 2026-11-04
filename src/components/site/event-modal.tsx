@@ -78,6 +78,11 @@ export function EventModal({ event, onClose }: { event: PublicEvent | null; onCl
             </ul>
             {event.description && <p className="text-[15px] leading-relaxed whitespace-pre-line text-stone-700">{event.description}</p>}
             <div className="flex flex-wrap gap-3 pt-2">
+              {event.isSpecial && event.registrationToken && (
+                <Link href={`/inscripcion/${event.registrationToken}`} className="inline-flex items-center gap-2 rounded-full bg-brand-700 px-5 py-2.5 text-sm font-bold text-white hover:bg-brand-800">
+                  Inscribirme · {new Intl.NumberFormat("es-CO", { style: "currency", currency: "COP", maximumFractionDigits: 0 }).format(event.pricePerPerson)} por persona
+                </Link>
+              )}
               <Link href={`/eventos/${event.slug}`} className="inline-flex items-center gap-2 rounded-full bg-ink px-5 py-2.5 text-sm font-bold text-white hover:bg-stone-800">
                 Ver detalles <ExternalLink className="size-4" />
               </Link>

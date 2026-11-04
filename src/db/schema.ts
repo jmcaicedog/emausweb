@@ -96,6 +96,9 @@ export const events = pgTable(
     mapUrl: text("map_url").notNull().default(""),
     published: boolean("published").notNull().default(false),
     attendanceToken: varchar("attendance_token", { length: 64 }).notNull().unique(),
+    isSpecial: boolean("is_special").notNull().default(false),
+    pricePerPerson: integer("price_per_person").notNull().default(0),
+    registrationToken: varchar("registration_token", { length: 64 }).unique(),
     ...timestamps,
   },
   (t) => [index("events_starts_at_idx").on(t.startsAt)],
@@ -127,6 +130,44 @@ export const attendances = pgTable(
     uniqueIndex("attendances_event_person_uq").on(t.eventId, t.personId),
     index("attendances_person_idx").on(t.personId),
   ],
+);
+
+export const eventRegistrations = pgTable(
+  "event_registrations",
+  {
+    id: serial("id").primaryKey(),
+    eventId: integer("event_id")
+      .notNull()
+      .references(() => events.id, { onDelete: "cascade" }),
+    personId: integer("person_id")
+      .notNull()
+      .references(() => people.id, { onDelete: "cascade" }),
+    companions: integer("companions").notNull().default(0),
+    amountDue: integer("amount_due").notNull(),
+    attendanceToken: varchar("attendance_token", { length: 64 }).notNull().unique(),
+    checkedInAt: timestamp("checked_in_at", { withTimezone: true }),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [
+    uniqueIndex("event_registrations_event_person_uq").on(t.eventId, t.personId),
+    index("event_registrations_event_idx").on(t.eventId),
+  ],
+);
+
+export const eventRegistrationPayments = pgTable(
+  "event_registration_payments",
+  {
+    id: serial("id").primaryKey(),
+    registrationId: integer("registration_id")
+      .notNull()
+      .references(() => eventRegistrations.id, { onDelete: "cascade" }),
+    amount: integer("amount").notNull(),
+    adminUserId: integer("admin_user_id")
+      .notNull()
+      .references(() => adminUsers.id, { onDelete: "restrict" }),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [index("event_registration_payments_registration_idx").on(t.registrationId)],
 );
 
 export const rateLimits = pgTable("rate_limits", {
